@@ -6,6 +6,8 @@
 }
 html{
   font-size: 62.5%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 h1,h2,h3,h4,h5,h6{
   color: var(--heading-color);
@@ -71,6 +73,8 @@ a{
 
 body{
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
   color: var(--text);
   background-color: #060b18;
   background-image:
@@ -84,4 +88,9 @@ body{
 ::selection{
   background: var(--accent);
   color: var(--accent-contrast);
+}
+
+#root{
+  min-height: 100vh;
+  min-height: 100dvh;
 }

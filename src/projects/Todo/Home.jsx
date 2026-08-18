@@ -54,12 +54,7 @@ export const Home = () => {
   return (
     <main className="app-shell app-shell--center">
       <section className="hero">
-        <span className="hero-badge">
-          <MdBolt />
-          Realtime · No signup
-        </span>
-
-        <h1>Shared Todo List</h1>
+        <h1>Todo List</h1>
         <TodoDate />
 
         <p className="hero-subtitle">
@@ -81,7 +76,7 @@ export const Home = () => {
           disabled={creating}
         >
           <MdTaskAlt />
-          {creating ? "Creating..." : "Create New Shared List"}
+          {creating ? "Creating..." : "Create New List"}
         </button>
 
         <div className="feature-grid">

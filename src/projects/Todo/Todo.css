@@ -1,25 +1,30 @@
 /* Layout shell shared by the home page and a shared list page */
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 6.4rem 2rem 8rem;
+  padding: 6.4rem 3.2rem 8rem;
+  padding-top: calc(6.4rem + env(safe-area-inset-top));
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom));
+  padding-left: calc(3.2rem + env(safe-area-inset-left));
+  padding-right: calc(3.2rem + env(safe-area-inset-right));
 }
 
 .app-shell--center {
   align-items: center;
-  padding-top: 4rem;
+  padding-top: calc(4.8rem + env(safe-area-inset-top));
 }
 
 /* Glass card */
 .todo-card {
   width: 100%;
-  max-width: 62rem;
+  max-width: 72rem;
   display: flex;
   flex-direction: column;
-  gap: 2.4rem;
-  padding: 3.2rem;
+  gap: 2.8rem;
+  padding: 3.6rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -46,10 +51,10 @@
 .brand-badge {
   display: grid;
   place-items: center;
-  width: 4.8rem;
-  height: 4.8rem;
+  width: 5.4rem;
+  height: 5.4rem;
   flex-shrink: 0;
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   color: var(--accent-contrast);
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--accent), var(--accent-alt));
@@ -57,7 +62,7 @@
 }
 
 .brand h1 {
-  font-size: 2.8rem;
+  font-size: clamp(2.6rem, 2vw + 1.8rem, 3.4rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.05rem;
@@ -66,9 +71,9 @@
 .date-time {
   margin-top: 0.4rem;
   font-family: "Urbanist", sans-serif;
-  font-size: 1.3rem;
+  font-size: clamp(1.4rem, 0.4vw + 1.3rem, 1.7rem);
   font-weight: 600;
-  letter-spacing: 0.05rem;
+  letter-spacing: 0.04rem;
   color: var(--text-muted);
 }
 
@@ -85,11 +90,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.8rem;
+  min-height: 4.4rem;
   font-family: inherit;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 600;
   letter-spacing: 0.02rem;
-  padding: 1rem 1.6rem;
+  padding: 1.1rem 1.8rem;
   border: 1px solid transparent;
   border-radius: 999px;
   cursor: pointer;
@@ -153,8 +159,9 @@
 }
 
 .btn-lg {
-  font-size: 1.6rem;
-  padding: 1.4rem 2.8rem;
+  font-size: 1.8rem;
+  min-height: 5.2rem;
+  padding: 1.5rem 3.2rem;
 }
 
 /* Add task form */
@@ -171,19 +178,20 @@
 .input-icon {
   position: absolute;
   top: 50%;
-  left: 1.7rem;
+  left: 1.8rem;
   transform: translateY(-50%);
-  font-size: 2.1rem;
+  font-size: 2.4rem;
   color: var(--text-muted);
   pointer-events: none;
 }
 
 .todo-input {
   width: 100%;
+  min-height: 5.2rem;
   font-family: inherit;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   color: var(--text);
-  padding: 1.4rem 1.8rem 1.4rem 4.8rem;
+  padding: 1.5rem 2rem 1.5rem 5.2rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -213,7 +221,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0.04rem;
   color: var(--text-muted);
@@ -264,7 +272,7 @@
 }
 
 .todo-text {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   line-height: 1.45;
   letter-spacing: 0.02rem;
   color: var(--text);
@@ -281,9 +289,9 @@
 .check-btn {
   display: grid;
   place-items: center;
-  width: 2.8rem;
-  height: 2.8rem;
-  font-size: 1.7rem;
+  width: 3.2rem;
+  height: 3.2rem;
+  font-size: 1.9rem;
   color: transparent;
   background: transparent;
   border: 0.2rem solid rgba(255, 255, 255, 0.24);
@@ -308,9 +316,9 @@
 .delete-btn {
   display: grid;
   place-items: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  font-size: 2rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  font-size: 2.2rem;
   color: var(--text-muted);
   background: transparent;
   border: 1px solid transparent;
@@ -342,7 +350,7 @@
 }
 
 .empty-state p {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   letter-spacing: 0.02rem;
   color: var(--text-muted);
 }
@@ -371,7 +379,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.4rem 1.6rem;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   line-height: 1.5;
   color: var(--text-muted);
   background: var(--surface);
@@ -409,7 +417,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0.04rem;
   color: var(--text-muted);
@@ -436,11 +444,11 @@
 /* Home hero */
 .hero {
   width: 100%;
-  max-width: 62rem;
+  max-width: 78rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 2.2rem;
   text-align: center;
   animation: rise-in 460ms ease both;
 }
@@ -465,7 +473,7 @@
 }
 
 .hero h1 {
-  font-size: 5.2rem;
+  font-size: clamp(4.2rem, 5vw + 1.2rem, 7.2rem);
   font-weight: 800;
   line-height: 1.06;
   letter-spacing: -0.16rem;
@@ -477,9 +485,9 @@
 }
 
 .hero-subtitle {
-  max-width: 46rem;
-  font-size: 1.7rem;
-  line-height: 1.6;
+  max-width: 58rem;
+  font-size: clamp(1.8rem, 0.6vw + 1.6rem, 2.2rem);
+  line-height: 1.65;
   color: var(--text-muted);
 }
 
@@ -499,8 +507,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
-  padding: 2rem 1.4rem;
+  gap: 1rem;
+  padding: 2.4rem 1.6rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -515,12 +523,12 @@
 }
 
 .feature-card svg {
-  font-size: 2.2rem;
+  font-size: 2.6rem;
   color: var(--accent);
 }
 
 .feature-card p {
-  font-size: 1.3rem;
+  font-size: 1.6rem;
   font-weight: 600;
   letter-spacing: 0.03rem;
   color: var(--text-muted);
@@ -570,23 +578,70 @@
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 4.8rem 2.4rem 6.4rem;
+    padding-top: calc(4.8rem + env(safe-area-inset-top));
+    padding-bottom: calc(6.4rem + env(safe-area-inset-bottom));
+    padding-left: calc(2.4rem + env(safe-area-inset-left));
+    padding-right: calc(2.4rem + env(safe-area-inset-right));
+  }
+
+  .todo-card {
+    max-width: 64rem;
+    padding: 2.8rem;
+  }
+
+  .hero {
+    max-width: 64rem;
+  }
+
+  .feature-grid {
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 640px) {
   .app-shell {
-    padding: 3.2rem 1.4rem 5.6rem;
+    padding: 2.4rem 1.6rem 4rem;
+    padding-top: calc(2.4rem + env(safe-area-inset-top));
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+    padding-left: calc(1.6rem + env(safe-area-inset-left));
+    padding-right: calc(1.6rem + env(safe-area-inset-right));
+  }
+
+  .app-shell--center {
+    align-items: flex-start;
+    padding-top: calc(3.2rem + env(safe-area-inset-top));
   }
 
   .todo-card {
     gap: 2rem;
-    padding: 2.2rem 1.8rem;
+    padding: 2rem 1.6rem;
     border-radius: 2rem;
   }
 
   .todo-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .brand h1 {
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .btn,
+  .header-actions a.btn {
+    flex: 1;
+  }
+
+  .brand {
+    gap: 1.2rem;
+  }
+
+  .brand-badge {
+    width: 4.6rem;
+    height: 4.6rem;
     font-size: 2.4rem;
   }
 
@@ -598,17 +653,53 @@
     width: 100%;
   }
 
+  .todo-input,
+  .todo-form .btn {
+    min-height: 4.8rem;
+    font-size: 1.6rem;
+  }
+
+  .todo-text {
+    font-size: 1.6rem;
+  }
+
+  .hero {
+    gap: 1.8rem;
+  }
+
   .hero h1 {
-    font-size: 3.6rem;
-    letter-spacing: -0.1rem;
+    letter-spacing: -0.08rem;
   }
 
   .hero-subtitle {
-    font-size: 1.5rem;
+    max-width: 100%;
+    font-size: 1.7rem;
+  }
+
+  .btn-lg {
+    width: 100%;
+    max-width: 36rem;
   }
 
   .feature-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .feature-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1.4rem;
+    padding: 1.6rem 1.8rem;
+    text-align: left;
+  }
+
+  .feature-card svg {
+    font-size: 2.2rem;
+  }
+
+  .feature-card p {
+    font-size: 1.6rem;
   }
 
   .todo-footer {
@@ -619,6 +710,29 @@
 
   .todo-footer .btn {
     width: 100%;
+  }
+
+  .live-badge {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero h1 {
+    font-size: 3.4rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.6rem;
+  }
+
+  .brand h1 {
+    font-size: 2.2rem;
+  }
+
+  .todo-item {
+    gap: 1.2rem;
+    padding: 1.4rem 1.4rem;
   }
 }
 

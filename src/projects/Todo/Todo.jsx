@@ -94,7 +94,7 @@ export const Todo = () => {
 
         {!loading && !isReady && (
           <Link to="/" className="btn btn-primary btn-lg">
-            Create New Shared List
+            Create New List
           </Link>
         )}
 
