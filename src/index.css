@@ -1,0 +1,87 @@
+*{
+  margin: 0;
+  padding:0;
+  box-sizing: border-box;
+  font-family:"Urbanist", sans-serif ;
+}
+html{
+  font-size: 62.5%;
+}
+h1,h2,h3,h4,h5,h6{
+  color: var(--heading-color);
+  font-family:"Poppins", sans-serif;
+  font-weight: 900;
+}
+h1{
+  font-size: 3.2rem;
+}
+p,li,a, label{
+  font-size: 1.8rem;
+  letter-spacing: 0.1rem;
+  color: var( --para-color);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+li{
+  list-style: none;
+}
+
+a{
+  text-decoration: none;
+}
+
+:root{
+  --heading-color:#ffffff;
+  --para-color:#8ea6b2;
+
+  /* Surfaces and lines for the glass cards */
+  --surface:rgba(255, 255, 255, 0.045);
+  --surface-strong:rgba(255, 255, 255, 0.08);
+  --border:rgba(255, 255, 255, 0.09);
+  --border-strong:rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --text:#e8f2f6;
+  --text-muted:#8ea6b2;
+  --text-faint:rgba(255, 255, 255, 0.35);
+
+  /* Accents */
+  --accent:#3b82f6;
+  --accent-alt:#2563eb;
+  --accent-soft:rgba(59, 130, 246, 0.16);
+  --accent-line:rgba(59, 130, 246, 0.45);
+  --accent-glow:rgba(59, 130, 246, 0.34);
+  --accent-contrast:#ffffff;
+  --accent-text:#bfdbfe;
+  --hero-gradient:linear-gradient(120deg, #ffffff, #bfdbfe 52%, #93c5fd);
+  --success:#34d399;
+  --success-soft:rgba(52, 211, 153, 0.12);
+  --warning:#fbbf24;
+  --danger:#fb7185;
+  --danger-soft:rgba(251, 113, 133, 0.12);
+
+  /* Shape and depth */
+  --radius-lg:2.4rem;
+  --radius-md:1.4rem;
+  --radius-sm:1rem;
+  --shadow-lg:0 2.4rem 6rem rgba(0, 0, 0, 0.5);
+  --shadow-accent:0 1rem 2.4rem rgba(37, 99, 235, 0.3);
+}
+
+body{
+  min-height: 100vh;
+  color: var(--text);
+  background-color: #060b18;
+  background-image:
+    radial-gradient(60rem 60rem at 12% -12%, rgba(59, 130, 246, 0.2), transparent 60%),
+    radial-gradient(52rem 52rem at 105% 105%, rgba(14, 165, 233, 0.14), transparent 58%),
+    linear-gradient(160deg, #060b18, #101b35 58%, #070e1e);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection{
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
