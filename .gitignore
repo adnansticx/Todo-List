@@ -14,6 +14,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+bun.lock
 
 # Editor directories and files
 .vscode/*
