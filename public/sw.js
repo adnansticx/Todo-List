@@ -47,12 +47,40 @@ self.addEventListener("push", (event) => {
     payload = { body: event.data ? event.data.text() : "" };
   }
 
+  const title = payload.title || "Todo reminder";
+  const options = {
+    body: payload.body || "",
+    tag: payload.tag,
+    icon: "/todo.svg",
+    data: {
+      url: payload.url || `${self.location.origin}/`,
+      id: payload.id,
+      listId: payload.listId,
+      remindAt: payload.remindAt,
+      content: payload.body || "",
+    },
+  };
+
   event.waitUntil(
-    self.registration.showNotification(payload.title || "Todo reminder", {
-      body: payload.body || "",
-      tag: payload.tag,
-      icon: "/todo.svg",
-      data: { url: payload.url || `${self.location.origin}/` },
-    })
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windowClients) => {
+        const visible = windowClients.some(
+          (client) => client.visibilityState === "visible"
+        );
+        windowClients.forEach((client) => {
+          client.postMessage({
+            type: "REMINDER_PUSH",
+            todo: {
+              id: payload.id,
+              listId: payload.listId,
+              remindAt: payload.remindAt,
+              content: payload.body || "",
+            },
+          });
+        });
+        if (visible) return undefined;
+        return self.registration.showNotification(title, options);
+      })
   );
 });

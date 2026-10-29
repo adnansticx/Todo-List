@@ -17,6 +17,7 @@ import { TodoList } from "./TodoList";
 import { TodoDate } from "./TodoDate";
 import { useSharedTodos } from "./useSharedTodos";
 import { useReminders } from "./reminderContext";
+import { registerDevicePush } from "./pushReminders";
 import { saveListReminders } from "./reminderStore";
 import { ReminderPrompt } from "./ReminderPrompt";
 
@@ -43,6 +44,23 @@ export const Todo = () => {
     if (listStatus !== "ready") return;
     saveListReminders(listId, task);
   }, [listId, listStatus, task]);
+
+  useEffect(() => {
+    if (permission !== "granted" || listStatus !== "ready" || !listId) return undefined;
+    let cancelled = false;
+    void registerDevicePush(listId).then((result) => {
+      if (cancelled || result.ok || result.reason === "unsupported") return;
+      if (result.reason === "server") {
+        setReminderHint((current) =>
+          current ??
+          "Reminders work while this tab is open. The closed-browser schedule is not ready on the server yet."
+        );
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [permission, listStatus, listId]);
 
   const handleAddTodo = async (input) => {
     const saved = await addTodo(input);

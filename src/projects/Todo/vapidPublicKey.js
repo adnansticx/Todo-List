@@ -1,0 +1,1 @@
+export const VAPID_PUBLIC_KEY = "BLdTKUJZOhz-i6Mv3lBD2-0wh5BXubUkfS7reCCd904gN-q0r73djx7cDruZ93IGtwkcox2VySf1tPucAdFD7B4";

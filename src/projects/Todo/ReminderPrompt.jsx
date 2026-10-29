@@ -40,7 +40,7 @@ export const ReminderPrompt = ({ open, busy, onAllow, onClose }) => {
         <h2 id="reminder-prompt-title">Get reminders?</h2>
         <p id="reminder-prompt-text">
           Allow notifications and this device will remind you at the time you
-          set on a task.
+          set, even if Chrome is closed.
         </p>
         <div className="prompt-actions">
           <button

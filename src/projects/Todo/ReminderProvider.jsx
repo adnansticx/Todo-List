@@ -4,8 +4,10 @@ import {
   getReminderSnapshot,
   isPendingReminder,
   markNotified,
+  pushReminderToast,
   showTodoNotification,
   subscribeReminders,
+  wasNotified,
 } from "./reminderStore";
 import { ReminderContext } from "./reminderContext";
 import { ReminderToast } from "./ReminderToast";
@@ -23,6 +25,20 @@ export const ReminderProvider = ({ children }) => {
   const [tasks, setTasks] = useState(getReminderSnapshot);
 
   useEffect(() => subscribeReminders(() => setTasks(getReminderSnapshot())), []);
+
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return undefined;
+
+    const onMessage = (event) => {
+      const todo = event.data?.type === "REMINDER_PUSH" ? event.data.todo : null;
+      if (!todo?.id || !todo.remindAt || wasNotified(todo)) return;
+      markNotified(todo);
+      if (document.visibilityState === "visible") pushReminderToast(todo);
+    };
+
+    navigator.serviceWorker.addEventListener("message", onMessage);
+    return () => navigator.serviceWorker.removeEventListener("message", onMessage);
+  }, []);
 
   useEffect(() => {
     if (permission !== "granted" || typeof Notification === "undefined") return undefined;
