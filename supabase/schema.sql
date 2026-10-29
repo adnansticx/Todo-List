@@ -28,9 +28,19 @@ create table if not exists public.todos (
   list_id text not null references public.lists (id) on delete cascade,
   task text not null,
   completed boolean not null default false,
+  remind_at timestamptz,
   created_at timestamptz not null default now(),
   constraint todos_task_length check (char_length(task) between 1 and 500)
 );
+
+-- Existing projects already have the table, so create-if-not-exists will not
+-- add the column. This alter is safe to run more than once.
+alter table public.todos
+  add column if not exists remind_at timestamptz;
+
+create index if not exists todos_open_reminders_idx
+  on public.todos (remind_at)
+  where remind_at is not null and completed = false;
 
 create index if not exists todos_list_id_created_at_idx
   on public.todos (list_id, created_at);

@@ -1,12 +1,55 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isSupabaseConfigured, supabase } from "../../lib/supabase";
 import { isValidListId } from "../../lib/listId";
+import { localReminderFor, rememberLocalReminder } from "./reminderStore";
+
+const TODO_WITH_REMINDER =
+  "id, list_id, task, completed, created_at, remind_at";
+const TODO_LEGACY = "id, list_id, task, completed, created_at";
+
+const isMissingRemindColumn = (error) => {
+  if (!error) return false;
+  return (
+    error.code === "PGRST204" ||
+    error.code === "42703" ||
+    /remind_at/i.test(error.message ?? "")
+  );
+};
 
 const mapTodoFromDb = (row) => ({
   id: row.id,
   content: row.task,
   checked: Boolean(row.completed),
+  remindAt: row.remind_at ?? localReminderFor(row.id),
 });
+
+const sameRemindAt = (left, right) => {
+  if (!left && !right) return true;
+  if (!left || !right) return false;
+  const leftTime = Date.parse(left);
+  const rightTime = Date.parse(right);
+  if (Number.isNaN(leftTime) || Number.isNaN(rightTime)) return left === right;
+  return leftTime === rightTime;
+};
+
+const isSameTask = (item, content, remindAt) =>
+  item.content === content && sameRemindAt(item.remindAt, remindAt);
+
+const selectTodos = async (listId) => {
+  const withReminder = await supabase
+    .from("todos")
+    .select(TODO_WITH_REMINDER)
+    .eq("list_id", listId)
+    .order("created_at", { ascending: true });
+
+  if (!isMissingRemindColumn(withReminder.error)) return withReminder;
+
+  return supabase
+    .from("todos")
+    .select(TODO_LEGACY)
+    .eq("list_id", listId)
+    .order("created_at", { ascending: true });
+};
 
 const CONFIG_ERROR =
   "This app is not connected to Supabase yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then restart the dev server.";
@@ -72,11 +115,7 @@ export const useSharedTodos = (listId) => {
         return;
       }
 
-      const { data: todos, error: todosError } = await supabase
-        .from("todos")
-        .select("id, list_id, task, completed, created_at")
-        .eq("list_id", listId)
-        .order("created_at", { ascending: true });
+      const { data: todos, error: todosError } = await selectTodos(listId);
 
       if (cancelled) return;
 
@@ -116,7 +155,7 @@ export const useSharedTodos = (listId) => {
                 const optimisticIndex = prev.findIndex(
                   (item) =>
                     String(item.id).startsWith("temp-") &&
-                    item.content === incoming.content
+                    isSameTask(item, incoming.content, incoming.remindAt)
                 );
 
                 if (optimisticIndex !== -1) {
@@ -189,17 +228,26 @@ export const useSharedTodos = (listId) => {
   const addTodo = useCallback(
     async (inputValue) => {
       const content = inputValue?.content?.trim?.() ?? "";
-      if (!content || !supabase) return;
+      const remindAt = inputValue?.remindAt ?? null;
+      if (!content || !supabase) return false;
 
-      if (taskRef.current.some((item) => item.content === content)) return;
+      if (taskRef.current.some((item) => isSameTask(item, content, remindAt))) {
+        return false;
+      }
 
       const optimisticId = `temp-${crypto.randomUUID()}`;
-      const optimisticTodo = { id: optimisticId, content, checked: false };
+      const optimisticTodo = {
+        id: optimisticId,
+        content,
+        checked: false,
+        remindAt,
+      };
 
       setTask((prev) => {
         if (
           prev.some(
-            (item) => item.id === optimisticId || item.content === content
+            (item) =>
+              item.id === optimisticId || isSameTask(item, content, remindAt)
           )
         ) {
           return prev;
@@ -208,16 +256,35 @@ export const useSharedTodos = (listId) => {
       });
       setError(null);
 
-      const { data, error: insertError } = await supabase
+      const payload = { list_id: listId, task: content, completed: false };
+      if (remindAt) payload.remind_at = remindAt;
+
+      let stored = remindAt ? "database" : null;
+      let { data, error: insertError } = await supabase
         .from("todos")
-        .insert({ list_id: listId, task: content, completed: false })
-        .select("id, list_id, task, completed, created_at")
+        .insert(payload)
+        .select(remindAt ? TODO_WITH_REMINDER : TODO_LEGACY)
         .single();
+
+      if (insertError && remindAt && isMissingRemindColumn(insertError)) {
+        const retry = await supabase
+          .from("todos")
+          .insert({ list_id: listId, task: content, completed: false })
+          .select(TODO_LEGACY)
+          .single();
+        data = retry.data;
+        insertError = retry.error;
+        if (!insertError && data?.id) {
+          rememberLocalReminder(data.id, remindAt);
+          data = { ...data, remind_at: remindAt };
+          stored = "device";
+        }
+      }
 
       if (insertError) {
         setTask((prev) => prev.filter((item) => item.id !== optimisticId));
         setError("Could not add the task. Please try again.");
-        return;
+        return false;
       }
 
       const saved = mapTodoFromDb(data);
@@ -228,6 +295,7 @@ export const useSharedTodos = (listId) => {
         }
         return [...withoutOptimistic, saved];
       });
+      return { ok: true, stored };
     },
     [listId]
   );

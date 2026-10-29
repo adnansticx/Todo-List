@@ -1,12 +1,18 @@
-import { MdCheck, MdDeleteOutline } from "react-icons/md";
+import { MdCheck, MdDeleteOutline, MdNotificationsNone } from "react-icons/md";
+import { formatRemindAt } from "./reminderStore";
 
 export const TodoList = ({
   id,
   data,
   checked,
+  remindAt,
   onHandleDeleteTodo,
   onHandleCheckedTodo,
 }) => {
+  const reminderLabel = remindAt ? formatRemindAt(remindAt) : "";
+  const overdue =
+    Boolean(reminderLabel) && !checked && Date.parse(remindAt) < Date.now();
+
   return (
     <li className={`todo-item${checked ? " is-done" : ""}`}>
       <button
@@ -17,7 +23,15 @@ export const TodoList = ({
       >
         <MdCheck />
       </button>
-      <span className="todo-text">{data}</span>
+      <div className="todo-main">
+        <span className="todo-text">{data}</span>
+        {reminderLabel && (
+          <span className={`todo-remind${overdue ? " is-overdue" : ""}`}>
+            <MdNotificationsNone />
+            {reminderLabel}
+          </span>
+        )}
+      </div>
       <button
         type="button"
         className="delete-btn"

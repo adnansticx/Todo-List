@@ -1,0 +1,17 @@
+{
+  "name": "Todo List",
+  "short_name": "Todo",
+  "description": "A shared todo list with reminders.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060b18",
+  "theme_color": "#00121a",
+  "icons": [
+    {
+      "src": "/todo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

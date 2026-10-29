@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   MdAdd,
@@ -7,6 +7,8 @@ import {
   MdContentCopy,
   MdDeleteOutline,
   MdErrorOutline,
+  MdNotificationsActive,
+  MdNotificationsNone,
   MdOutlineInbox,
 } from "react-icons/md";
 import "./Todo.css";
@@ -14,6 +16,9 @@ import { TodoForm } from "./TodoForm";
 import { TodoList } from "./TodoList";
 import { TodoDate } from "./TodoDate";
 import { useSharedTodos } from "./useSharedTodos";
+import { useReminders } from "./reminderContext";
+import { saveListReminders } from "./reminderStore";
+import { ReminderPrompt } from "./ReminderPrompt";
 
 export const Todo = () => {
   const { listId } = useParams();
@@ -28,7 +33,79 @@ export const Todo = () => {
     deleteTodo,
     clearTodos,
   } = useSharedTodos(listId);
+  const { permission, enableReminders } = useReminders();
   const [copied, setCopied] = useState(false);
+  const [reminderHint, setReminderHint] = useState(null);
+  const [promptOpen, setPromptOpen] = useState(false);
+  const [promptBusy, setPromptBusy] = useState(false);
+
+  useEffect(() => {
+    if (listStatus !== "ready") return;
+    saveListReminders(listId, task);
+  }, [listId, listStatus, task]);
+
+  const handleAddTodo = async (input) => {
+    const saved = await addTodo(input);
+    if (!saved?.ok || !input.remindAt) return;
+
+    if (saved.stored === "device") {
+      setReminderHint(
+        "Reminder saved on this browser. Add the remind_at column in Supabase so your phone can use the same time."
+      );
+    }
+
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      setPromptOpen(true);
+      return;
+    }
+
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission !== "granted"
+    ) {
+      setReminderHint(
+        "Task saved. Allow reminders so this device can notify you at that time."
+      );
+    }
+  };
+
+  const closeReminderPrompt = useCallback(() => {
+    setPromptOpen(false);
+  }, []);
+
+  const handleEnableReminders = () => {
+    if (permission === "unsupported") {
+      setReminderHint("This browser cannot show notifications.");
+      return;
+    }
+
+    if (permission === "denied") {
+      setReminderHint(
+        "Notifications are blocked for this site. Allow them in the browser settings, then reload."
+      );
+      return;
+    }
+
+    setPromptOpen(true);
+  };
+
+  const handleConfirmReminders = async () => {
+    setPromptBusy(true);
+    const result = await enableReminders();
+    setPromptBusy(false);
+    setPromptOpen(false);
+
+    if (result === "granted") {
+      setReminderHint(null);
+      return;
+    }
+
+    setReminderHint(
+      result === "denied"
+        ? "Notifications are blocked for this site. Allow them in the browser settings, then reload."
+        : "Allow notifications in the browser prompt to get reminders."
+    );
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -69,6 +146,21 @@ export const Todo = () => {
                 {copied ? <MdCheck /> : <MdContentCopy />}
                 {copied ? "Copied!" : "Copy Link"}
               </button>
+              {permission === "granted" ? (
+                <span className="reminder-status">
+                  <MdNotificationsActive />
+                  Reminders on
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={handleEnableReminders}
+                >
+                  <MdNotificationsNone />
+                  Allow reminders
+                </button>
+              )}
               <Link to="/" className="btn btn-ghost">
                 <MdAdd />
                 New List
@@ -100,7 +192,14 @@ export const Todo = () => {
 
         {isReady && (
           <>
-            <TodoForm onAddTodo={addTodo} />
+            {reminderHint && (
+              <p className="status-note">
+                <MdNotificationsNone />
+                {reminderHint}
+              </p>
+            )}
+
+            <TodoForm onAddTodo={handleAddTodo} />
 
             {total > 0 && (
               <div className="progress">
@@ -133,6 +232,7 @@ export const Todo = () => {
                       id={curTask.id}
                       data={curTask.content}
                       checked={curTask.checked}
+                      remindAt={curTask.remindAt}
                       onHandleDeleteTodo={deleteTodo}
                       onHandleCheckedTodo={toggleTodo}
                     />
@@ -161,6 +261,13 @@ export const Todo = () => {
           </>
         )}
       </section>
+
+      <ReminderPrompt
+        open={promptOpen}
+        busy={promptBusy}
+        onAllow={handleConfirmReminders}
+        onClose={closeReminderPrompt}
+      />
     </main>
   );
 };
