@@ -141,8 +141,10 @@ try {
           }
         );
         delivered = true;
+        console.log(`push accepted ${subscription.origin}`);
       } catch (error) {
-        const status = error?.statusCode;
+        const status = error?.statusCode ?? "unknown";
+        console.log(`push failed ${status} ${subscription.origin}`);
         if (status === 404 || status === 410) {
           await client.query(
             "delete from public.push_subscriptions where id = $1",
